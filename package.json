@@ -1,0 +1,20 @@
+{
+  "name": "adventofcode2022",
+  "version": "1.0.0",
+  "description": "Advent of Code 2022 Solutions",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "gen": "ts-node src/lib/gen_files.ts",
+    "solve": "ts-node src/lib/runner.ts"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@types/jest": "^29.2.3",
+    "axios": "^1.2.0",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.3"
+  }
+}
