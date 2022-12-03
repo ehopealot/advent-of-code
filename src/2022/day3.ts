@@ -1,4 +1,4 @@
-import {loadPuzzleInput} from '../lib/load_file'
+import {loadPuzzleInput} from '../lib/load_file';
 
 export function part1(example=false) {
   const inp = loadPuzzleInput("3", example, "2022");

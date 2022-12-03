@@ -1,4 +1,4 @@
-import {loadPuzzleInput} from '../lib/load_file'
+import {loadPuzzleInput} from '../lib/load_file';
 
 /*
   A: rock

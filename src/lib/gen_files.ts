@@ -38,7 +38,7 @@ const genFiles = async () => {
   const codePath = `./src/${year}/day${day}.ts`;
   const testPath = `./src/${year}/day${day}.test.ts`;
 
-  const sourceContent = `import {loadPuzzleInput} from '../lib/load_file'
+  const sourceContent = `import {loadPuzzleInput} from '../lib/load_file';
 
 export function part1(example=false) {
   const inp = loadPuzzleInput("${day}", example, "${year}");
