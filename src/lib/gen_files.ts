@@ -35,6 +35,9 @@ const genFiles = async () => {
 
   await downloadFile();
 
+  // example file
+  fs.closeSync(fs.openSync(`./inputs/${year}/day${day}-example.txt`, "w"));
+
   const codePath = `./src/${year}/day${day}.ts`;
   const testPath = `./src/${year}/day${day}.test.ts`;
 
