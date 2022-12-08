@@ -1,12 +1,12 @@
 import {loadPuzzleInput} from '../lib/load_file';
 
 
-function runCommands(inp: string[]) {
+function runCommands(inp: string[]): {[k: string]: number} {
   const files: {[k: string]: boolean} = {};
-  const dirs: {[k: string]: number} = {};
+//  const dirs: {[k: string]: number} = {};
   const navstack: string[] = [''];
 
-  inp.forEach(line => {
+  return inp.reduce((dirs, line) => {
     const dirPath = navstack.join('/');
     if (line.startsWith('$ cd ')) {
       const directory = line.slice(5);
@@ -18,7 +18,7 @@ function runCommands(inp: string[]) {
         navstack.push(directory);
       }
     } else if (line.startsWith('$ ls') || line.startsWith('dir')) {
-      return;
+      // continue
     } else {
       const [size, name] = line.split(' ');
       if (!files[dirPath + '/' + name]) {
@@ -31,9 +31,8 @@ function runCommands(inp: string[]) {
         }
       }
     }
-  });
-
-  return dirs;
+    return dirs;
+  }, {});
 }
 
 export function part1(example=false) {
