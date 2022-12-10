@@ -35,31 +35,30 @@ export function part1(example=false) {
 
 export function part2(example=false) {
   const inp = loadPuzzleInput("10", example, "2022");
-  let x = 1;
-  let cycle = 1;
+  let spritePos = 1;
+  let pixel = 0;
   const screen: string[][] = [];
 
   for (let i = 0; i < 6; i++) {
     screen.push(new Array<string>(40));
   }
 
-  const incrementCycle = (spritePos: number) => {
-    const pixel = cycle - 1;
+  const drawPixel = () => {
     const overlap = Math.abs((spritePos - pixel % 40)) <= 1;
     screen[Math.floor(pixel / 40)][pixel % 40] = overlap ? '#' : '.';
-    cycle += 1;
+    pixel += 1;
   }
 
   inp.forEach((instruction) => {
     if (instruction === 'noop') {
-      incrementCycle(x);
+      drawPixel();
     } else {
       const amount = parseInt(instruction.split(' ')[1]);
       // start of instruction
-      incrementCycle(x);
+      drawPixel();
       // execute instruction
-      incrementCycle(x);
-      x += amount;
+      drawPixel();
+      spritePos += amount;
     }
   });
 
