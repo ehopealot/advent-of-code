@@ -44,9 +44,8 @@ export function part2(example=false) {
   }
 
   const incrementCycle = (spritePos: number) => {
-    let overlap = false;
     const pixel = cycle - 1;
-    overlap = Math.abs((spritePos - pixel % 40)) <= 1;
+    const overlap = Math.abs((spritePos - pixel % 40)) <= 1;
     screen[Math.floor(pixel / 40)][pixel % 40] = overlap ? '#' : '.';
     cycle += 1;
   }
