@@ -264,7 +264,7 @@ export function part2(example=false) {
 
   // Cycle starts at 1305, is 6820 long, adds 10328 height
   // (figure out from inspection... value at 1305 is 1985, at 8125 its 12313,
-  // at 14945 its 22641... (22641 - 12313) = 10328. 1495 - 8125 = 6820. So...
+  // at 14945 its 22641... (22641 - 12313) = 10328. 14945 - 8125 = 6820. So...
 
   // (10^12 - 1305) % 6820 === 5395
   // Height at 1305 + 5395 is 10164. (just ran the simulation to find this)
