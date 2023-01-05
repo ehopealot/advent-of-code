@@ -9,7 +9,7 @@ describe("day 20", () => {
 
   describe("part2", () => {
     it("matches the example", () => {
-      expect(part2(true)).toEqual(0);
+      expect(part2(true)).toEqual(1623178306);
     });
   });
 });
