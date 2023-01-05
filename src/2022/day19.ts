@@ -29,9 +29,12 @@ type RobotFactory = {
   geodeRobots: number;
 }
 
+type RobotType = 'ore' | 'clay' | 'obsidian' | 'geode';
+
 export function part1(example=false) {
   const inp = loadPuzzleInput("19", example, "2022");
   let score = 1;
+
   inp.forEach((line, idx) => {
     if (idx > 2) {
       return;
@@ -49,85 +52,94 @@ export function part1(example=false) {
       geodeRobots: 0
     };
 
-    const factories: Queue<RobotFactory> = new Queue<RobotFactory>();
-    factories.add(factory);
     let maxGeodeSoFar = 0;
-    let maxGeodeRobotsSoFar = 0;
-    for (let i = 0; i < 32; i++) {
+    const dfs = (factory: RobotFactory, target: RobotType | null, minute: number) => {
 
-      while (factories.peek().minute === i) {
-        const curFact = factories.dequeue();
+      const delta = Math.min(32, minute) - factory.minute;
+      factory.ore += (delta) * factory.oreRobots;
+      factory.clay += (delta) * factory.clayRobots;
+      factory.obsidian += (delta) * factory.obsidianRobots;
+      factory.geodes += (delta) * factory.geodeRobots;
+      factory.minute = Math.min(32, minute);
 
-        const oldOre = curFact.oreRobots;
-        const oldClay = curFact.clayRobots;
-        const oldObsidian = curFact.obsidianRobots;
-        const oldGeodes = curFact.geodeRobots;
-
-        const addResources = (factory: RobotFactory) => {
-
-          factory.ore += oldOre;
-          factory.clay += oldClay;
-          factory.obsidian += oldObsidian;
-          factory.geodes += oldGeodes;
-          factory.minute = i + 1;
-          if (factory.geodes > maxGeodeSoFar) {
-            maxGeodeSoFar = factory.geodes;
-          }
-          if (factory.geodeRobots > maxGeodeRobotsSoFar) {
-            maxGeodeRobotsSoFar = factory.geodeRobots;
-          }
-
-          if (factory.geodeRobots > maxGeodeRobotsSoFar - 2) {
-            factories.enqueue(factory);
-          }
+      if (minute >= 32) {
+        if (factory.geodes > maxGeodeSoFar) {
+          maxGeodeSoFar = factory.geodes;
         }
+        return;
+      }
 
-        const canBuildOre = curFact.ore >= bluePrint.oreOre;
-        const canBuildClay = curFact.ore >= bluePrint.clayOre;
-        const canBuildObsidian = curFact.clay >= bluePrint.obsidianClay && curFact.ore >= bluePrint.obsidianOre;
-        const canBuildGeode = curFact.obsidian >= bluePrint.geodeObsidian && curFact.ore >= bluePrint.geodeOre;
+      const timeToEnd = 32 - factory.minute;
+      if (factory.geodes + factory.geodeRobots * timeToEnd + ((timeToEnd * (timeToEnd + 1)) / 2) < maxGeodeSoFar) {
+        // trim search. abort impossible branches (even if you build a geode robot every subsequent turn you can't win
+        return;
+      }
 
-
-        if (canBuildGeode) {
-          const f = {...curFact};
-          f.ore -= bluePrint.geodeOre;
-          f.obsidian -= bluePrint.geodeObsidian;
-          f.geodeRobots += 1;
-          addResources(f);
-        } else {
-
-          if (canBuildObsidian) {
-            const f = {...curFact};
-            f.ore -= bluePrint.obsidianOre;
-            f.clay -= bluePrint.obsidianClay;
-            f.obsidianRobots += 1;
-            addResources(f);
-          }
-            if (canBuildClay && i < 20) {
-              const clayFactory = {...curFact};
-              clayFactory.ore -= bluePrint.clayOre;
-              clayFactory.clayRobots += 1;
-              addResources(clayFactory);
-            }
-            if (canBuildOre && i < 10) {
-              const oreFactory = {...curFact};
-              oreFactory.ore -= bluePrint.oreOre;
-              oreFactory.oreRobots += 1;
-              addResources(oreFactory);
-            }
-          }
-          addResources(curFact);
+      const targetOre = (f: RobotFactory) => {
+        const timeToOre = 1 + Math.max(0, Math.ceil((bluePrint.oreOre - f.ore) / f.oreRobots));
+        if (timeToOre != Infinity && f.obsidianRobots === 0) {
+          dfs(f, 'ore', minute + timeToOre);
         }
+      }
+      const targetClay = (f: RobotFactory) => {
+        const timeToClay = 1 + Math.max(0, Math.ceil((bluePrint.clayOre - f.ore) / f.oreRobots));
+        if (timeToClay != Infinity && f.geodeRobots === 0) {
+          dfs(f, 'clay', minute + timeToClay);
+        }
+      }
+      const targetObsidian = (f: RobotFactory) => {
+        const timeToObsidian = 1 + Math.max(0, Math.max(Math.ceil((bluePrint.obsidianOre - f.ore) / f.oreRobots), Math.ceil((bluePrint.obsidianClay - f.clay) / f.clayRobots)));
+        if (timeToObsidian != Infinity) {
+          dfs(f, 'obsidian', minute + timeToObsidian);
+        }
+      }
+      const targetGeode = (f: RobotFactory) => {
+        const timeToGeode = 1 + Math.max(0, Math.max(Math.ceil((bluePrint.geodeOre - f.ore) / f.oreRobots), Math.ceil((bluePrint.geodeObsidian - f.obsidian) / f.obsidianRobots)));
+        if (timeToGeode != Infinity) {
+          dfs(f, 'geode', minute + timeToGeode);
+        }
+      }
 
+      const targetEverything = () => {
+        targetGeode({...factory});
+        targetObsidian({...factory});
+        targetClay({...factory});
+        targetOre({...factory});
+        // go to the end
+        dfs({...factory}, null, 32);
+      }
+      if (target === null) {
+        targetEverything();
+      } else if (target === 'ore') {
+        factory.ore -= bluePrint.oreOre;
+        factory.oreRobots += 1;
+        targetEverything();
+      } else if (target === 'clay') {
+        factory.ore -= bluePrint.clayOre;
+        factory.clayRobots += 1;
+        targetEverything();
+      } else if (target === 'obsidian') {
+        factory.clay -= bluePrint.obsidianClay;
+        factory.ore -= bluePrint.obsidianOre;
+        factory.obsidianRobots += 1;
+        targetEverything();
+      } else {
+        factory.ore -= bluePrint.geodeOre;
+        factory.obsidian -= bluePrint.geodeObsidian;
+        factory.geodeRobots += 1;
+        targetEverything();
+      }
     }
-    score *= maxGeodeSoFar
+
+    dfs(factory, null, 1);
+    score *= maxGeodeSoFar;
     console.log(maxGeodeSoFar);
   });
+
 
   return score;
 }
 
 export function part2(example=false) {
-  const inp = loadPuzzleInput("19", example, "2022");
-  return 0;
+  return part1(example);
 }
