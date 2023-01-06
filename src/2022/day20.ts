@@ -40,10 +40,6 @@ function solve(input: Array<string>, rounds=1, key=1) {
       const node = map[inp[i]].shift();
 
       const moves = node.val % (inp.length - 1);
-      if (moves == 0) {
-        map[inp[i]].push(node);
-        continue;
-      }
       const prev = node.prev;
       const next = node.next;
 
