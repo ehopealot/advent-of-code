@@ -1,4 +1,7 @@
+import * as dotenv from 'dotenv';
 import * as path from 'path';
+
+dotenv.config()
 
 const args = process.argv.slice(2);
 const day = args.shift();
