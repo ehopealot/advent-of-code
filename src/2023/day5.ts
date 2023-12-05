@@ -64,6 +64,22 @@ const parseMaps2 = (input: string[]) => {
 }
 
 
+const sortAndCompact = (ranges: number[][]) => {
+  ranges.sort((r1, r2) => r1[0] - r2[0]);
+  const compacted = [];
+  let cur = ranges[0];
+  for (let i = 1; i < ranges.length; i++) {
+    if (cur[1] >= ranges[i][0]) {
+      cur = [cur[0], Math.max(ranges[i][1], cur[1])];
+    } else {
+      compacted.push(cur);
+      cur = ranges[i];
+    }
+  }
+  compacted.push(cur);
+  return compacted;
+}
+
 export function part2(example=false) {
   const inp = loadPuzzleInput("5", example, "2023");
 
@@ -76,12 +92,13 @@ export function part2(example=false) {
 
   let inputRanges = seedRanges;
   for (let m = 0; m < maps.length; m++) {
-    const ranges = maps[m];
+    const transformRanges = maps[m];
     const newRanges = [];
     inputRanges.forEach(input => {
       const [inpStart, inpEnd] = input;
       let overlap = false;
-      ranges.forEach(range => {
+      const takenChunks = [];
+      transformRanges.forEach(range => {
         const [sourceStart, sourceEnd, dest] = range;
         if (inpStart <= sourceEnd) {
           if (inpEnd > sourceStart) {
@@ -92,43 +109,31 @@ export function part2(example=false) {
               dest + (transformStartRange - sourceStart),
               dest + (transformEndRange - sourceStart),
             ]);
-            if (inpStart < sourceStart) {
-              newRanges.push([inpStart, sourceStart]);
-            }
-            if (inpEnd > sourceEnd) {
-              newRanges.push([sourceEnd, inpEnd]);
-            }
+            takenChunks.push([transformStartRange, transformEndRange]);
           }
         }
       });
       if (!overlap) {
+        // if the range isn't touched at all by the transforms
         newRanges.push(input);
       }
+      if (takenChunks.length) {
+        // these are all the parts of the input range which are not transformed
+        const compactedTakenChunks = sortAndCompact(takenChunks);
+        let s = inpStart;
+        for (let i = 0; i < compactedTakenChunks.length; i++) {
+          if (compactedTakenChunks[i][0] > s) {
+            newRanges.push([s, compactedTakenChunks[i][1]]);
+            s = compactedTakenChunks[i][1];
+          }
+        }
+        if (s !== inpStart && s !== inpEnd) {
+          newRanges.push([s, inpEnd]);
+        }
+      }
     });
 
-    newRanges.sort((r1, r2) => {
-      if (r1[0] < r2[0]) {
-        return -1;
-      } else if (r1[0] > r2[0]) {
-        return 1;
-      }
-      return 0;
-    });
-    const compacted = [];
-    let cur = newRanges[0];
-    for (let i = 1; i < newRanges.length; i++) {
-      if (cur[1] >= newRanges[i][0]) {
-        cur = [cur[0], Math.max(newRanges[i][1], cur[1])];
-      } else {
-        compacted.push(cur);
-        cur = newRanges[i];
-      }
-    }
-    compacted.push(cur);
-
-    console.log(compacted);
-    inputRanges = compacted;
+    inputRanges = sortAndCompact(newRanges);
   };
-  console.log(inputRanges);
   return inputRanges.reduce((min, range) => Math.min(range[0], min), Number.MAX_SAFE_INTEGER);
 }
