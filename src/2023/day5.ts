@@ -91,18 +91,16 @@ export function part2(example=false) {
   }
 
   let inputRanges = seedRanges;
-  for (let m = 0; m < maps.length; m++) {
-    const transformRanges = maps[m];
+  maps.forEach(transformRanges => {
     const newRanges = [];
     inputRanges.forEach(input => {
       const [inpStart, inpEnd] = input;
-      let overlap = false;
       const takenChunks = [];
       transformRanges.forEach(range => {
         const [sourceStart, sourceEnd, dest] = range;
         if (inpStart <= sourceEnd) {
           if (inpEnd > sourceStart) {
-            overlap = true;
+            // there's an overlap with the input
             const transformStartRange = Math.max(inpStart, sourceStart);
             const transformEndRange = Math.min(inpEnd, sourceEnd);
             newRanges.push([
@@ -113,10 +111,6 @@ export function part2(example=false) {
           }
         }
       });
-      if (!overlap) {
-        // if the range isn't touched at all by the transforms
-        newRanges.push(input);
-      }
       if (takenChunks.length) {
         // these are all the parts of the input range which are not transformed
         const compactedTakenChunks = sortAndCompact(takenChunks);
@@ -130,10 +124,12 @@ export function part2(example=false) {
         if (s !== inpStart && s !== inpEnd) {
           newRanges.push([s, inpEnd]);
         }
+      } else {
+        newRanges.push(input);
       }
     });
 
     inputRanges = sortAndCompact(newRanges);
-  };
+  });
   return inputRanges.reduce((min, range) => Math.min(range[0], min), Number.MAX_SAFE_INTEGER);
 }
