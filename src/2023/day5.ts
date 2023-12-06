@@ -117,7 +117,7 @@ export function part2(example=false) {
         let s = inpStart;
         for (let i = 0; i < compactedTakenChunks.length; i++) {
           if (compactedTakenChunks[i][0] > s) {
-            newRanges.push([s, compactedTakenChunks[i][1]]);
+            newRanges.push([s, compactedTakenChunks[i][0]]);
             s = compactedTakenChunks[i][1];
           }
         }
