@@ -53,6 +53,9 @@ export function part1(example=false) {
     };
 
     let maxGeodeSoFar = 0;
+
+    let aborts = 0;
+    let completes = 0;
     const dfs = (factory: RobotFactory, target: RobotType | null, minute: number) => {
 
       const delta = Math.min(32, minute) - factory.minute;
@@ -66,12 +69,14 @@ export function part1(example=false) {
         if (factory.geodes > maxGeodeSoFar) {
           maxGeodeSoFar = factory.geodes;
         }
+        completes += 1;
         return;
       }
 
       const timeToEnd = 32 - factory.minute;
       if (factory.geodes + factory.geodeRobots * timeToEnd + ((timeToEnd * (timeToEnd + 1)) / 2) < maxGeodeSoFar) {
         // trim search. abort impossible branches (even if you build a geode robot every subsequent turn you can't win
+        aborts += 1;
         return;
       }
 
@@ -134,6 +139,8 @@ export function part1(example=false) {
     dfs(factory, null, 1);
     score *= maxGeodeSoFar;
     console.log(maxGeodeSoFar);
+    console.log(`aborted ${aborts} branches`);
+    console.log(`completed ${completes} branches`);
   });
 
 
