@@ -18,13 +18,13 @@ const parseHand = (hand: string) => {
 
   const numJokers = cardCounts['J'];
   delete cardCounts['J'];
-  const cardsAndCount = [...Object.entries(cardCounts)].sort(([card1, count1], [card2, count2]) => (
+  const countsInOrder = [...Object.entries(cardCounts)].sort(([card1, count1], [card2, count2]) => (
     count1 != count2 ? count1 - count2 : cardScore[card1] - cardScore[card2])).map(([_c, count]) => count);
 
-  let count1 = cardsAndCount.pop();
+  let count1 = countsInOrder.pop();
   count1 += numJokers;
 
-  const count2 = cardsAndCount.pop();
+  const count2 = countsInOrder.pop();
   const handType = count1 + (count2 > 1 ? .5 : 0);
   return {cards: cards, handType, bid: parseInt(bid)};
 }
@@ -42,13 +42,14 @@ const compareHands = (hand1: Hand, hand2: Hand) => {
   return 0;
 }
 
-export function part1(example=false) {
+export function part2(example=false) {
   const hands = loadPuzzleInput("7", example, "2023").map(hand => parseHand(hand));
   hands.sort(compareHands);
   return hands.reduce((acc, hand, idx) => acc + (hand.bid * (idx + 1)), 0);
 }
 
-export function part2(example=false) {
+
+export function part1(example=false) {
   const hands = loadPuzzleInput("7", example, "2023").map(hand => parseHand(hand));
   hands.sort(compareHands);
   return hands.reduce((acc, hand, idx) => acc + (hand.bid * (idx + 1)), 0);
