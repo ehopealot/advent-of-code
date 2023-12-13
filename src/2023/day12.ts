@@ -56,6 +56,8 @@ const search = (conditions: string, sizes: number[], sizeIdx: number, pos: numbe
   // find all the possible places for the current size
   for (let i = pos; i < Math.min(firstPound, conditions.length); i++) {
     if (conditions.substring(i).match(needed)) {
+      // starts are where to start looking for the _next_ run of broken springs. Meaning the current position, plus the 
+      // length of the current run being placed, plus 1, since all runs are separated by a working spring. 
       starts.push(i + sizeNeeded + 1);
     }
   }
