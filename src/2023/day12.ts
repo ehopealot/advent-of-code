@@ -10,7 +10,7 @@ const parseRecord = (record: string, repeats = 1) => {
     newConditions += ('?' + conditions);
   }
 
-  // trim unnecessary starts and finishes
+  // trim unnecessary '.' from the beginning and end
   let s = 0;
   for (let i = 0; newConditions.charAt(i) === '.'; i++) {
     s++;
