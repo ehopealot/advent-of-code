@@ -24,7 +24,7 @@ const parseRecord = (record: string, repeats = 1) => {
   return {conditions: newConditions.substring(s, e+1) + '.', sizes: newSizes};
 }
 
-const search = (conditions: string, sizes: number[], sizeIdx: number, pos: number, runningProduct: number, seen: {[k: string]: number}) => {
+const search = (conditions: string, sizes: number[], sizeIdx: number, pos: number, seen: {[k: string]: number}) => {
 
   if (sizeIdx === sizes.length) {
     if (!conditions.includes('#', pos)) {
@@ -58,7 +58,7 @@ const search = (conditions: string, sizes: number[], sizeIdx: number, pos: numbe
   // answer is sum of products of all the possibilities for each
   // possible position of the current size (some of which are impossible
   // and thus zero)
-  const sum = starts.reduce((acc, start) => (search(conditions, sizes, sizeIdx + 1, start, runningProduct, seen) * runningProduct) + acc, 0);
+  const sum = starts.reduce((acc, start) => (search(conditions, sizes, sizeIdx + 1, start, seen)) + acc, 0);
   seen[key] = sum;
   return sum;
 }
@@ -70,7 +70,7 @@ export function part1(example=false) {
 
   const answer = inp.map(({conditions, sizes}) => {
     let start = 0;
-    return search(conditions, sizes, 0, start, 1, {});
+    return search(conditions, sizes, 0, start, {});
   });
 
   return answer.reduce((acc, n) => acc + n, 0);
@@ -81,7 +81,7 @@ export function part2(example=false) {
 
   const answer = inp.map(({conditions, sizes}) => {
     console.log('searching...');
-    return search(conditions, sizes, 0, 0, 1, {});
+    return search(conditions, sizes, 0, 0, {});
   });
 
   return answer.reduce((acc, n) => acc + n, 0);
