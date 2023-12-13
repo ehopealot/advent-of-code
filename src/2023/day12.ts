@@ -27,9 +27,12 @@ const parseRecord = (record: string, repeats = 1) => {
 const search = (conditions: string, sizes: number[], sizeIdx: number, pos: number, seen: {[k: string]: number}) => {
 
   if (sizeIdx === sizes.length) {
+    // base case, zero broken springs to allocate
     if (!conditions.includes('#', pos)) {
+      // its a valid configuration -- theres no more broken springs on the plan
       return 1;
     }
+    // invalid. if there's no more runs of broken springs but still broken springs in the plan
     return 0;
   }
 
@@ -42,6 +45,8 @@ const search = (conditions: string, sizes: number[], sizeIdx: number, pos: numbe
   const needed = new RegExp(`^(\\?|#){${sizeNeeded}}[^#]`)
   const starts: number[] = [];
   let firstPound = conditions.indexOf('#', pos);
+  // reasoning: ou have to include the next '#' in the next run of broken springs, you can't
+  // skip it. So only runs which include it can be searched further.
   if (firstPound === -1) {
     firstPound = Number.MAX_SAFE_INTEGER;
   } else {
@@ -59,6 +64,7 @@ const search = (conditions: string, sizes: number[], sizeIdx: number, pos: numbe
   // possible position of the current size (some of which are impossible
   // and thus zero)
   const sum = starts.reduce((acc, start) => (search(conditions, sizes, sizeIdx + 1, start, seen)) + acc, 0);
+  // memo key is the specific run of broken springs (sizeIdx) and the position in the configuration
   seen[key] = sum;
   return sum;
 }
