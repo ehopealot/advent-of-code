@@ -31,19 +31,9 @@ export function part1(example=false) {
 }
 
 const findReflectionSmudged = (pattern: string[], multiplier = 1) => {
-  const distance = (s1: string, s2: string) => {
-    let dist = 0;
-    for (let i = 0; i < s1.length; i++) {
-      if (s1[i] !== s2[i]) {
-        dist += 1;
-      }
-    }
-    if (dist > 1) {
-      // doesnt matter what this value is as long as it's > 1
-      return 2;
-    }
-    return dist;
-  }
+  const distance = (s1: string, s2: string) => (
+    s1.split('').filter((c, idx) => c != s2[idx]).length
+  );
 
   for (let i = 1; i < pattern.length; i++) {
     let offset = 0;
@@ -51,11 +41,10 @@ const findReflectionSmudged = (pattern: string[], multiplier = 1) => {
     while (i + offset < pattern.length && i - offset > 0) {
       const dist = distance(pattern[i + offset], pattern[i - offset - 1]);
       cumulativeDistance += dist;
-      if (cumulativeDistance <= 1) {
-        offset += 1;
-      } else {
+      if (cumulativeDistance > 1) {
         break;
       }
+      offset++;
     }
     if (cumulativeDistance === 1 && (i + offset === pattern.length || i - offset === 0)) {
       return i * multiplier;
@@ -73,7 +62,6 @@ export function part2(example=false) {
   const patternsRotated = patterns.map(pattern => {
     return pattern[0].split('').map((_, idx) => pattern.map(row => row[idx]).join(''));
   });
-//  console.log(patternsRotated.map(p => p.join('\n')).join('\n\n'));
   return patterns.reduce((acc, p) => findReflectionSmudged(p, 100) + acc, 0) +
     patternsRotated.reduce((acc, p) => findReflectionSmudged(p) + acc, 0)
 }
