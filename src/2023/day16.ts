@@ -19,7 +19,6 @@ const reflectAll = (grid: string[][]) => {
 
 const reflect = (grid: string[][], startAt?: [number, number, number]) => {
   // y, x, direction. directions 0: up, 1: right, 2: down, 3: left
-  console.log(startAt);
   startAt = startAt || [0, -1, 1];
   const s = new Set<string>();
   let beams: [number, number, number, Set<string>][] = [[...startAt, s]];
