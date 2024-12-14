@@ -22,6 +22,42 @@ const parseInput = (inp: number[]) => {
   return [files, free];
 }
 
+// sum of [0, end of file] - sum of [0, start of file)
+const scoreFile = (file: FileRange) => {
+  const endOfFile = file.start + file.length - 1;
+  const beforeFile = file.start - 1;
+  return file.fileId *
+    (((endOfFile * (endOfFile + 1)) / 2) -
+      ((beforeFile * (beforeFile + 1)) / 2));
+}
+
+export function part1_faster(inp: number[]) {
+  let checksum = 0;
+  const [files, free] = parseInput(inp);
+  let freeIdx = 0;
+  for (let i = files.length - 1; i >= 0; i--) {
+    const file = files[i];
+    while (true) {
+      let freeRange = free[freeIdx];
+      if (!freeRange || file.length === 0 || freeRange.start >= file.start) {
+	break;
+      }
+      const originalLength = freeRange.length;
+      freeRange.fileId = file.fileId;
+      freeRange.length = Math.min(file.length, freeRange.length);
+      checksum += scoreFile(freeRange);
+      file.length -= freeRange.length;
+      freeRange.start += freeRange.length;
+      freeRange.length = originalLength - freeRange.length;
+      if (freeRange.length === 0) {
+	freeIdx += 1;
+      }
+    }
+    checksum += scoreFile(file);
+  }
+  return checksum;
+}
+
 export function solve(inp: number[], part2 = false) {
  const [files, free] = parseInput(inp);
   const movedFiles: FileRange[] = [];
@@ -56,20 +92,12 @@ export function solve(inp: number[], part2 = false) {
       files.push(lastFile);
     } 
   }
-  // sum of [0, end of file] - sum of [0, start of file)
-  const scoreFile = (file: FileRange) => {
-    const endOfFile = file.start + file.length - 1;
-    const beforeFile = file.start - 1;
-    return file.fileId *
-      (((endOfFile * (endOfFile + 1)) / 2) -
-	((beforeFile * (beforeFile + 1)) / 2));
-  }
   return movedFiles.reduce((total, file) => total + scoreFile(file), 0);
 }
 
 export function part1(example=false) {
   const inp = loadPuzzleInput("9", example, "2024")[0].split("").map(i => parseInt(i));
-  return solve(inp);
+  return part1_faster(inp);
 }
 
 export function part2(example=false) {
