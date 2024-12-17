@@ -25,3 +25,20 @@ export function neighborVisit(grid: Array<Array<unknown>>, y: number, x: number,
     }
   };
 }
+
+const cardinalMoves = [
+  [0, 1],
+  [1, 0],
+  [0, -1],
+  [-1, 0],
+];
+export function cardinalVisit(grid: Array<Array<unknown>>, y: number, x: number, visit: (y: number, x: number, dy: number, dx: number) => boolean | void) {
+  for (let i = 0; i < cardinalMoves.length; i++) {
+    const [dy, dx] = cardinalMoves[i];
+    if (inBounds(grid, y + dy, x + dx)) {
+      if (visit(y + dy, x + dx, dy, dx)) {
+	break;
+      }
+    }
+  };
+}
